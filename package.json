@@ -1,0 +1,24 @@
+{
+	"name": "markdownsite",
+	"version": "1.0.0",
+	"description": "serve markdown files as html",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [
+		"markdown",
+		"html",
+		"express",
+		"nodejs"
+	],
+	"author": "Luiz Fernando Mendonca",
+	"license": "MIT",
+	"dependencies": {
+		"highlight.js": "^10.2.0",
+		"marked": "^1.1.1"
+	},
+	"devDependencies": {
+		"express": "^4.17.1"
+	}
+}
