@@ -29,16 +29,34 @@ function serveMDasHTML(rootDir, options = {}) {
 		htmlPosContent: options.htmlPosContent || '',
 		markerOptions: options.markerOptions || DEFAULT_MARKER_OPTIONS,
 		extraHtmlHead: options.extraHtmlHead || '',
+		defaultMDfiles: options.defaultMDfiles || ['README.md', 'README.MD', 'readme.md', 'index.md'],
+		redirectOnDefault: (typeof options.redirectOnDefault === 'boolean')?options.redirectOnDefault:true, //redirect instead of rendering directly when a default is found
 	};
 	marked.setOptions(opts.markerOptions);
 	return function(req, res, next) {
-		const thisurl = url.parse(req.url);
-		if (thisurl.pathname.substr(-3, 3) == '.md') {
+		let thisurl = url.parse(req.url).pathname;
+		let renderMD = false;
+		// if request is for a Markdown file, mark to render as MD, else check if it's a directory request and if so, check if we have any default MD's in this dir.
+		if (thisurl.substr(-3, 3) == '.md') renderMD = true;
+		else if (thisurl.substr(-1, 1) == '/') {
+			let i = 0;
+			while (!renderMD && i < opts.defaultMDfiles.length) {
+				if (fs.existsSync(rootDir + thisurl + opts.defaultMDfiles[i])) {
+					if (opts.redirectOnDefault) return res.redirect(req.url+opts.defaultMDfiles[i]);
+					thisurl += opts.defaultMDfiles[i];
+					renderMD = true;
+				}
+				i++;
+			}
+		}
+		// if we didn't find something to render, then just go to next middleware, else, render and send response
+		if (!renderMD) return next();
+		else {
 			let classlesscss = '';
 			let highlightercss = '';
-			if (opts.classlessCSS.length>0) classlesscss = `<link rel="stylesheet" href="${opts.cssBasePath}/${opts.classlessCSS}">`;
-			if (opts.highlighterCSS.length>0) highlightercss = `<link rel="stylesheet" href="${opts.cssBasePath}/${opts.highlighterCSS}">`;
-			const convertedContents = marked(fs.readFileSync(rootDir + thisurl.pathname).toString());
+			if (opts.classlessCSS.length > 0) classlesscss = `<link rel="stylesheet" href="${opts.cssBasePath}/${opts.classlessCSS}">`;
+			if (opts.highlighterCSS.length > 0) highlightercss = `<link rel="stylesheet" href="${opts.cssBasePath}/${opts.highlighterCSS}">`;
+			const convertedContents = marked(fs.readFileSync(rootDir + thisurl).toString());
 			res.send(`
 <html>
 	<head>
@@ -54,8 +72,7 @@ ${opts.htmlPosContent}
 </body>
 </html>`);
 		}
-		else next();
 	};
 }
 
-module.exports = { serveMDasHTML };
+module.exports = { serveMDasHTML, DEFAULT_MARKER_OPTIONS };
