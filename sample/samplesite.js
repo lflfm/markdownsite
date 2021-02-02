@@ -9,7 +9,7 @@ let serveMDopts = {
 		classlessCSS: 'modest.css',
 		highlighterCSS: 'highlighter-default.css',
 		cssBasePath: '/styles',
-		redirectOnDefault: false,
+		// redirectOnDefault: false,
 		defaultMDfiles: ['README.md', 'README.MD', 'readme.md', 'index.md','something.md'],
 };
 

@@ -30,7 +30,7 @@ function serveMDasHTML(rootDir, options = {}) {
 		markerOptions: options.markerOptions || DEFAULT_MARKER_OPTIONS,
 		extraHtmlHead: options.extraHtmlHead || '',
 		defaultMDfiles: options.defaultMDfiles || ['README.md', 'README.MD', 'readme.md', 'index.md'],
-		redirectOnDefault: (typeof options.redirectOnDefault === 'boolean')?options.redirectOnDefault:true, //redirect instead of rendering directly when a default is found
+		redirectOnDefault: (typeof options.redirectOnDefault === 'boolean') ? options.redirectOnDefault : true, //redirect instead of rendering directly when a default is found
 	};
 	marked.setOptions(opts.markerOptions);
 	return function(req, res, next) {
@@ -42,7 +42,7 @@ function serveMDasHTML(rootDir, options = {}) {
 			let i = 0;
 			while (!renderMD && i < opts.defaultMDfiles.length) {
 				if (fs.existsSync(rootDir + thisurl + opts.defaultMDfiles[i])) {
-					if (opts.redirectOnDefault) return res.redirect(req.url+opts.defaultMDfiles[i]);
+					if (opts.redirectOnDefault) return res.redirect(req.baseUrl + req.url + opts.defaultMDfiles[i]);
 					thisurl += opts.defaultMDfiles[i];
 					renderMD = true;
 				}
