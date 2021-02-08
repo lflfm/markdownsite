@@ -56,7 +56,9 @@ function serveMDasHTML(rootDir, options = {}) {
 			let highlightercss = '';
 			if (opts.classlessCSS.length > 0) classlesscss = `<link rel="stylesheet" href="${opts.cssBasePath}/${opts.classlessCSS}">`;
 			if (opts.highlighterCSS.length > 0) highlightercss = `<link rel="stylesheet" href="${opts.cssBasePath}/${opts.highlighterCSS}">`;
-			const convertedContents = marked(fs.readFileSync(rootDir + thisurl).toString());
+			try {
+				const convertedContents = marked(fs.readFileSync(rootDir + thisurl).toString());
+				// @todo we should test what happens when we try to convert (ex.) binary files here (ex. a zip file called attack.md..?)
 			res.send(`
 <html>
 	<head>
@@ -71,6 +73,11 @@ ${convertedContents}
 ${opts.htmlPosContent}
 </body>
 </html>`);
+			} catch(e) {
+				//if we have any issues rendering the markdown, most likely reason is that the file doesn't exist, so just call next
+				// @todo check for any issues we may have with the rendering itself, of files that do exist....
+				return next();
+			}
 		}
 	};
 }
